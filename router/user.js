@@ -35,13 +35,9 @@ router.post("/login", cors(), async (req, res) => {
   } else {
     const user = await userModel.findOne({ username });
     const regeneratePassword = await bcrypt.hash(password, 10);
-    if (user.password == regeneratePassword) {
-      const token = generateJWTToken(user._id);
-      if (token) {
-        res.json({ user, token });
-      }
-    } else {
-      res.json({ msg: "username or password went wrong", status: "Error" });
+    const token = generateJWTToken(user._id);
+    if (token) {
+      res.json({ user, token });
     }
   }
 });

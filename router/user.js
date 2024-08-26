@@ -45,8 +45,27 @@ router.get("/profile", authenticateJWT, (req, res) => {
   res.json(req.user);
 });
 router.post("/test", authenticateJWT, async (req, res) => {
-  const user = await userModel.findByIdAndUpdate(req.userId);
+  await userModel.findByIdAndUpdate(req.body.userId, req.body);
+  const user = await userModel.findOne({ _id: req.body.userId });
   res.json({ user });
+});
+router.post("/setting", authenticateJWT, async (req, res) => {
+  const { userId, username, fullName, age, job, school, picture } = req.body;
+  if (
+    !userId ||
+    !username ||
+    !fullName ||
+    !age ||
+    !job ||
+    !school ||
+    !picture
+  ) {
+    res.json({ msg: "Bad request", status: "Error" });
+  } else {
+    await userModel.findByIdAndUpdate(req.body.userId, req.body);
+    const user = await userModel.findOne({ _id: req.body.userId });
+    res.json({ user });
+  }
 });
 
 export default router;

@@ -44,5 +44,9 @@ router.post("/login", cors(), async (req, res) => {
 router.get("/profile", authenticateJWT, (req, res) => {
   res.json(req.user);
 });
+router.post("/test", authenticateJWT, async (req, res) => {
+  const user = await userModel.findByIdAndUpdate(req.userId);
+  res.json({ user });
+});
 
 export default router;

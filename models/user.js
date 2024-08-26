@@ -29,6 +29,9 @@ const userModel = mongoose.model("User", {
     type: String,
     default: "default",
   },
+  userScore: {
+    type: Object,
+  },
 });
 
 export default userModel;

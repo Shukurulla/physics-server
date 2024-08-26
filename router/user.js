@@ -17,6 +17,8 @@ router.post("/create-user", cors(), async (req, res) => {
       password: hashedPassword,
     });
     const token = generateJWTToken(user._id);
-    console.log(token);
+    if (token) {
+      res.json({ user, token });
+    }
   }
 });

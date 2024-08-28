@@ -14,7 +14,6 @@ const authenticateJWT = (req, res, next) => {
 
       try {
         const foundUser = await userModel.findById(user.userId);
-        console.log(foundUser);
         if (!foundUser) {
           return res.sendStatus(404);
         }

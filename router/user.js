@@ -14,31 +14,47 @@ router.post("/create-user", cors(), async (req, res) => {
   } else {
     const condidate = await userModel.findOne({ username });
     if (condidate) {
-      res.json({ msg: "Username already exist", status: "Error" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await userModel.create({
-      ...req.body,
-      password: hashedPassword,
-    });
-    const token = generateJWTToken(user._id);
-    if (token) {
-      res.json({ user, token });
+      res.json({
+        msg: "Bu foydalanuvchi oldin ro'hatdan o'tgan",
+        status: "Error",
+      });
+    } else {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const user = await userModel.create({
+        ...req.body,
+        password: hashedPassword,
+      });
+      const token = generateJWTToken(user._id);
+      if (token) {
+        res.json({ user, token });
+      }
     }
   }
 });
+
+const comparePassword = async (inputPassword, hashedPassword) => {
+  const isMatch = await bcrypt.compare(inputPassword, hashedPassword);
+  return isMatch;
+};
+
 router.post("/login", cors(), async (req, res) => {
   const { username, password } = req.body;
   if (!username || !password) {
-    res.json({ msg: "Bad request", status: "Error" });
+    res.json({ msg: "Iltimos barcha maydonlarni toldiring", status: "Error" });
+  }
+  const user = await userModel.findOne({ username });
+
+  if (user) {
+    comparePassword(password, user.password).then((isMatch) => {
+      if (isMatch) {
+        const token = generateJWTToken(user._id);
+        res.json({ user, token });
+      } else {
+        res.json({ msg: "Password noto'g'ri kiritildi", status: "Error" });
+      }
+    });
   } else {
-    const user = await userModel.findOne({ username });
-    const regeneratePassword = await bcrypt.hash(password, 10);
-    const token = generateJWTToken(user._id);
-    if (token) {
-      res.json({ user, token });
-    }
+    res.json({ msg: "Bunday username topilmadi", status: "Error" });
   }
 });
 router.get("/profile", authenticateJWT, (req, res) => {
